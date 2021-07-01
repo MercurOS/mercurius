@@ -1,1 +1,0 @@
-# Mercurius - Kernel for MercurOS
