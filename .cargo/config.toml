@@ -1,11 +1,11 @@
 [target.riscv64gc-unknown-none-elf]
-# Fragile hack!
-# Use --image-base to set the virtual addresses for the ELF file.
-# MercurOS Maia loads the kernel into physical memory according to the given virtual addresses.
-# QEMU:
-rustflags = ["-Clink-arg=--image-base=0x80020000"]
-# Freedom Unmatched:
-#rustflags = ["-Clink-arg=--image-base=0x87F0A000"]
+rustflags = [
+    "-Crelocation-model=pic",
+    "-Clink-arg=-znocombreloc",
+    "-Clink-arg=-shared",
+    "-Clink-arg=-Bsymbolic",
+    "-Clink-arg=-s",
+]
 
 [build]
 target = "riscv64gc-unknown-none-elf"
