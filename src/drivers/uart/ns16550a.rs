@@ -20,7 +20,7 @@ pub struct UartNs16550a {
     rbr_thr: Register<u8>,
 
     // interrupt enable
-    ier: Register<u8>,
+    _ier: Register<u8>,
 
     // interrupt ident. / FIFO control
     iir_fcr: Register<u8>,
@@ -29,16 +29,16 @@ pub struct UartNs16550a {
     lcr: Register<u8>,
 
     // modem control
-    mcr: Register<u8>,
+    _mcr: Register<u8>,
 
     // line status
-    lsr: Register<u8>,
+    _lsr: Register<u8>,
 
     // modem status
-    msr: Register<u8>,
+    _msr: Register<u8>,
 
     // scratch register
-    scr: Register<u8>,
+    _scr: Register<u8>,
 }
 
 bitflags! {
