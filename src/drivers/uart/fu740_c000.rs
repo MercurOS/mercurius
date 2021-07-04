@@ -3,6 +3,8 @@
 use crate::memory::Register;
 use crate::io::{Io, ReadOnly};
 
+use super::{StopBits, Uart};
+
 // Memory Map
 // 0x00 - txdata
 // 0x04 - rxdata
@@ -12,7 +14,7 @@ use crate::io::{Io, ReadOnly};
 // 0x14 - ip
 // 0x18 - div
 #[repr(packed)]
-pub struct UART {
+pub struct UartFu740 {
     // 0x0000_000f - data (0 on read)
     // 0x8000_0000 - full (ro)
     txdata: Register<u32>,
@@ -67,9 +69,9 @@ bitflags! {
     }
 }
 
-impl UART {
+impl UartFu740 {
     // The unsafeness here depends on platform and virtual memory layout
-    pub unsafe fn new(instance: usize) -> Option<&'static mut UART> {
+    pub unsafe fn new(instance: usize) -> Option<&'static mut UartFu740> {
         // 2 UART instances
         // 0 - 0x1001_0000 - 0x1001_0FFF
         // 1 - 0x1001_1000 - 0x1001_1FFF
@@ -106,12 +108,6 @@ impl UART {
             None
         } else {
             Some(raw_data.bits as u8)
-        }
-    }
-
-    pub fn write(&mut self, s: &str) {
-        for byte in s.bytes() {
-            self.send(byte);
         }
     }
 
@@ -168,8 +164,20 @@ impl UART {
     }
 }
 
-#[derive(PartialEq)]
-pub enum StopBits {
-    OneStopBit,
-    TwoStopBits,
+impl Uart for UartFu740 {
+    fn init(&mut self, stop_bits: StopBits) {
+        // disable interrupts
+        self.set_tx_watermark(None);
+        self.set_rx_watermark(None);
+
+        // enable rx & tx
+        self.tx_enable(stop_bits);
+        self.rx_enable();
+    }
+
+    fn write(&mut self, string: &str) {
+        for byte in string.bytes() {
+            self.send(byte);
+        }
+    }
 }

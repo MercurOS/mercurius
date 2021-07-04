@@ -3,6 +3,8 @@
 use crate::memory::Register;
 use crate::io::Io;
 
+use super::{StopBits, Uart};
+
 // Memory Map
 // 0x00 - RBR (RO) / THR (WO)
 // 0x01 - IER
@@ -13,7 +15,7 @@ use crate::io::Io;
 // 0x06 - MSR
 // 0x07 - SCR
 #[repr(packed)]
-pub struct UART {
+pub struct UartNs16550a {
     // data buffers
     rbr_thr: Register<u8>,
 
@@ -52,9 +54,9 @@ bitflags! {
     }
 }
 
-impl UART {
+impl UartNs16550a {
     // The unsafeness here depends on platform and virtual memory layout
-    pub unsafe fn new(base_address: *const core::ffi::c_void) -> &'static mut UART {
+    pub unsafe fn new(base_address: *const core::ffi::c_void) -> &'static mut UartNs16550a {
         &mut *(base_address as *mut Self)
     }
 
@@ -75,6 +77,23 @@ impl UART {
 
     pub fn write(&mut self, s: &str) {
         for byte in s.bytes() {
+            self.send(byte);
+        }
+    }
+}
+
+impl Uart for UartNs16550a {
+    fn init(&mut self, stop_bits: StopBits) {
+        // TODO: Set stop bits
+
+        self.set_word_length(8);
+
+        // enable rx & tx
+        self.fifo_enable();
+    }
+
+    fn write(&mut self, string: &str) {
+        for byte in string.bytes() {
             self.send(byte);
         }
     }
