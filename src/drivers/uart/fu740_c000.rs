@@ -84,24 +84,6 @@ impl UartFu740 {
         Some(&mut *(base as *mut Self))
     }
 
-    pub fn send(&mut self, data: u8) {
-        // Atomic write & OR allows sending with confirmation by
-        // simultaneously attempting a send and reading the buffer full flag.
-        // Since the data bits always read as zero, the read value is either
-        // zero indicating success or non-zero indicating full FIFO.
-        let mut retry = 1u32;
-        while retry != 0 {
-            unsafe {
-                asm!(
-                    "amoor.w {0}, {1}, ({2})",
-                    out(reg) retry,
-                    in(reg) data as u32,
-                    in(reg) self.txdata.raw_ptr(),
-                );
-            }
-        }
-    }
-
     pub fn receive(&mut self) -> Option<u8> {
         let raw_data = DataFlags::from_bits_truncate(self.txdata.read());
         if raw_data.contains(DataFlags::FIFO_FULL_OR_EMPTY) {
@@ -175,9 +157,21 @@ impl Uart for UartFu740 {
         self.rx_enable();
     }
 
-    fn write(&mut self, string: &str) {
-        for byte in string.bytes() {
-            self.send(byte);
+    fn send(&mut self, data: u8) {
+        // Atomic write & OR allows sending with confirmation by
+        // simultaneously attempting a send and reading the buffer full flag.
+        // Since the data bits always read as zero, the read value is either
+        // zero indicating success or non-zero indicating full FIFO.
+        let mut retry = 1u32;
+        while retry != 0 {
+            unsafe {
+                asm!(
+                    "amoor.w {0}, {1}, ({2})",
+                    out(reg) retry,
+                    in(reg) data as u32,
+                    in(reg) self.txdata.raw_ptr(),
+                );
+            }
         }
     }
 }

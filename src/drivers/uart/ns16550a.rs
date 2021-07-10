@@ -60,10 +60,6 @@ impl UartNs16550a {
         &mut *(base_address as *mut Self)
     }
 
-    pub fn send(&mut self, data: u8) {
-        self.rbr_thr.write(data);
-    }
-
     pub fn set_word_length(&mut self, _length: usize) {
         // TODO: adjustable word length
         let lcr = (LcrFlags::WORD_LENGTH_SELECT0 | LcrFlags::WORD_LENGTH_SELECT1).bits;
@@ -73,12 +69,6 @@ impl UartNs16550a {
     pub fn fifo_enable(&mut self) {
         let fcr = FcrFlags::FIFO_ENABLE.bits;
         self.iir_fcr.write(fcr);
-    }
-
-    pub fn write(&mut self, s: &str) {
-        for byte in s.bytes() {
-            self.send(byte);
-        }
     }
 }
 
@@ -92,9 +82,8 @@ impl Uart for UartNs16550a {
         self.fifo_enable();
     }
 
-    fn write(&mut self, string: &str) {
-        for byte in string.bytes() {
-            self.send(byte);
-        }
+    fn send(&mut self, data: u8) {
+        // TODO: block until sent
+        self.rbr_thr.write(data);
     }
 }
