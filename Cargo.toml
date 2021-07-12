@@ -12,3 +12,5 @@ fu740 = []
 
 [dependencies]
 bitflags = "1.2"
+lazy_static = { version = "1.4", features = ["spin_no_std"] }
+spin = "0.9"

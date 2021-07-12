@@ -1,5 +1,7 @@
 //! UART driver for HiFive Freedom Unmatched (FU740-C000).
 
+use bitflags::bitflags;
+
 use crate::memory::Register;
 use crate::io::{Io, ReadOnly};
 
@@ -175,3 +177,5 @@ impl Uart for UartFu740 {
         }
     }
 }
+
+unsafe impl Send for UartFu740 {}

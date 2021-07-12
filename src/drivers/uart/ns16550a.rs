@@ -1,5 +1,7 @@
 //! UART driver for NS16550a (QEMU).
 
+use bitflags::bitflags;
+
 use crate::memory::Register;
 use crate::io::Io;
 
@@ -87,3 +89,5 @@ impl Uart for UartNs16550a {
         self.rbr_thr.write(data);
     }
 }
+
+unsafe impl Send for UartNs16550a {}
