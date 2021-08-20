@@ -13,4 +13,5 @@ fu740 = []
 [dependencies]
 bitflags = "1.2"
 lazy_static = { version = "1.4", features = ["spin_no_std"] }
+mercuros-uefi = { git = "https://github.com/MercurOS/uefi", tag = "v0.1.0" }
 spin = "0.9"

@@ -26,7 +26,7 @@ pub struct Fdt<'a> {
 impl<'a> Fdt<'a> {
     pub unsafe fn from_ptr(pointer: *const core::ffi::c_void) -> Result<Fdt<'static>, FdtError> {
         let fdt_size = Fdt::read_length(pointer)?;
-        let fdt_buffer = unsafe { core::slice::from_raw_parts(pointer as *const u8, fdt_size) };
+        let fdt_buffer = core::slice::from_raw_parts(pointer as *const u8, fdt_size);
 
         Fdt::from_buffer(fdt_buffer)
     }
